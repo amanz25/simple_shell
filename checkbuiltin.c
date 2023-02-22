@@ -28,12 +28,12 @@ int _atoi(char *s)
 }
 
 /**
- * _exit - exits the shell with or without a return of status n
+ * _exit_cmd - exits the shell with or without a return of status n
  * @arv: array of words of the entered line
  *
  * Return: void.
  */
-void _exit(char **arv)
+void _exit_cmd(char **arv)
 {
 	int i, n;
 
@@ -114,7 +114,7 @@ void _setenv(char **arv)
 	if (!environ[i])
 	{
 
-		environ[i] = concat_all(arv[1], "=", arv[2]);
+		environ[i] = concat(arv[1], "=", arv[2]);
 		environ[i + 1] = '\0';
 
 	}

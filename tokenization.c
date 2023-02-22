@@ -47,8 +47,8 @@ void(*checkcommand(char **arv))(char **arv)
 {
 	int i, j;
 	command T[] = {
-		{"exit", exitt},
-		{"env", env},
+		{"exit", _exit_cmd},
+		{"env", _env},
 		{"setenv", _setenv},
 		{"unsetenv", _unsetenv},
 		{NULL, NULL}

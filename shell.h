@@ -8,7 +8,10 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <string.h>
+#include <signal.h>
 #include <stdarg.h>
+#include <sys/stat.h>
+
 
 extern char **environ;
 
@@ -40,12 +43,11 @@ char *concat(char *name, char *sep, char *value);
 
 void(*checkcommand(char **arv))(char **arv);
 
-void _exit(char **arv);
+void _exit_cmd(char **arv);
 int _atoi(char *s);
 void _env(char **arv __attribute__ ((unused)));
 void _setenv(char **arv);
 void _unsetenv(char **arv);
-
 void freearv(char **arv);
 
 /**

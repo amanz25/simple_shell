@@ -53,7 +53,7 @@ int main(void)
 			v = _getenv("PATH");
 			head = linkpath(v);
 			p = _which(arv[0], head);
-			func = checkbuild(arv);
+			func = checkcommand(arv);
 			if (func)
 			{
 				free(buff);
@@ -65,7 +65,7 @@ int main(void)
 			{
 				free(arv[0]);
 				arv[0] = p;
-				execute(arv);
+				executeCmd(arv);
 			}
 		}
 	}

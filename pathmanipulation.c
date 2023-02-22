@@ -36,7 +36,7 @@ char *_which(char *filename, list_path *head)
 	while (tmp)
 	{
 
-		string = concat_all(tmp->dir, "/", filename);
+		string = concat(tmp->dir, "/", filename);
 		if (stat(string, &st) == 0)
 		{
 			return (string);
