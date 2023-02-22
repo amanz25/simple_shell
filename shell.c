@@ -1,5 +1,27 @@
 #include "shell.h"
 
+
+/**
+ * EndOfFile - handles buffer end of file
+ * @b: buffer
+ * @l: length of input by std in
+ *
+ * Return: void.
+ */
+void EndOfFile(char *b, int l)
+{
+	(void) b;
+	if (l == -1)
+	{
+		if (isatty(STDIN_FILENO))
+		{
+			_puts("\n");
+			free(b);
+		}
+		exit(0);
+	}
+}
+
 /**
  * sig_handler - checks if Ctrl C is pressed
  * @sig_num: int

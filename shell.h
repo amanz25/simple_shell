@@ -8,8 +8,8 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <string.h>
+#include <stddef.h>
 #include <signal.h>
-#include <stdarg.h>
 #include <sys/stat.h>
 
 
@@ -29,7 +29,6 @@ typedef struct command
 void executeCmd(char **argv);
 
 void *Mem_Realloc(void *ptrPrev, unsigned int old_size, unsigned int new_size);
-void EndOfFile(char *b, int l);
 
 int _putchar(char c);
 void _puts(char *s);

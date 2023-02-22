@@ -52,27 +52,6 @@ void *Mem_Realloc(void *ptrPrev, unsigned int old_size, unsigned int new_size)
 }
 
 /**
- * EndOfFile - handles buffer end of file
- * @b: buffer
- * @l: length of input by std in
- *
- * Return: void.
- */
-void EndOfFile(char *b, int l)
-{
-	(void) b;
-	if (l == -1)
-	{
-		if (isatty(STDIN_FILENO))
-		{
-			_puts("\n");
-			free(b);
-		}
-		exit(0);
-	}
-}
-
-/**
  * freearv - frees the array of pointers arv
  *@arv: array of pointers
  *
