@@ -12,6 +12,16 @@
 
 extern char **environ;
 
+/**
+ * struct command - pointer to function with corresponding buildin command
+ * @name: buildin command
+ * @func: execute the buildin command
+ */
+typedef struct command
+{
+	char *name;
+	void (*func)(char **);
+} command;
 
 void executeCmd(char **argv);
 
@@ -26,5 +36,14 @@ char *_strdup(char *s);
 char **tokenize(char *s, const char *d);
 
 char *concat(char *name, char *sep, char *value);
+
+
+void(*checkcommand(char **arv))(char **arv);
+
+void _exit(char **arv);
+int _atoi(char *s);
+void _env(char **arv __attribute__ ((unused)));
+void _setenv(char **arv);
+void _unsetenv(char **arv);
 
 #endif
