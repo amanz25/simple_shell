@@ -12,7 +12,7 @@ int main(void)
 
 	while (l != EOF)
 	{
-		_puts("#");
+		_puts("#cisfun$");
 		l = getline(&buff, &size, stdin);
 		EndOfFile(buff, l);
 		arv = tokenize(buff, " \n");
