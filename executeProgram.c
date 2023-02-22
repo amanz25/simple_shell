@@ -14,12 +14,12 @@ void executeCmd(char **argv)
 		return;
 	process = fork();
 	if (process == -1)
-		perror("unable to create child process");
+		perror(_getenv("_"));
 	if (process == 0)
 	{
 		/* child created */
 		execve(argv[0], argv, environ);
-		perror("./shell");
+		perror(argv[0]);
 		exit(EXIT_FAILURE);
 	}
 	/* parent process will wait until the child finish */
