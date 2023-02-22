@@ -33,7 +33,8 @@ void terminal(void)
  */
 int main(void)
 {
-	ssize_t l = 0, size = 0;
+	ssize_t l = 0;
+	size_t size = 0;
 	char *buff = NULL, **arv, *v, *p;
 	list_path *head = '\0';
 	void (*func)(char **);
@@ -48,8 +49,7 @@ int main(void)
 		if (!arv || !arv[0])
 			executeCmd(arv);
 		else
-		{
-			/* get the env from PATH */
+		{	/* get the env from PATH */
 			v = _getenv("PATH");
 			head = linkpath(v);
 			p = _which(arv[0], head);

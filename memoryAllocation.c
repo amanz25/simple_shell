@@ -22,12 +22,10 @@ void *Mem_Realloc(void *ptrPrev, unsigned int old_size, unsigned int new_size)
 		free(ptrPrev);
 		return (NULL);
 	}
-
 	new = malloc(new_size);
 	old = ptrPrev;
 	if (new == NULL)
 		return (NULL);
-
 	if (new_size > old_size)
 	{
 		count = 0;
@@ -43,7 +41,8 @@ void *Mem_Realloc(void *ptrPrev, unsigned int old_size, unsigned int new_size)
 			new[count] = '\0';
 			count++;
 		}
-	} else
+	}
+	if (new_size < old_size)
 	{
 		for (count = 0; count < new_size; count++)
 			new[count] = old[count];
