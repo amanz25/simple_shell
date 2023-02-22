@@ -25,4 +25,6 @@ char *_strdup(char *s);
 
 char **tokenize(char *s, const char *d);
 
+char *concat(char *name, char *sep, char *value);
+
 #endif

@@ -18,7 +18,7 @@ void executeCmd(char **argv)
 	if (process == 0)
 	{
 		/* child created */
-		execve(argv[0], argv, environ);
+		execve(argv[0], NULL, environ);
 		perror("./shell");
 		exit(EXIT_FAILURE);
 	}
