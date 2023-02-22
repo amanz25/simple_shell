@@ -8,6 +8,10 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <string.h>
+#include <stdarg.h>
+
+extern char **environ;
+
 
 void executeCmd(char **argv);
 
