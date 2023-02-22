@@ -54,7 +54,7 @@ void _exit(char **arv)
 /**
  * _env - prints the current environment
  * @arv: array of arguments
- * 
+ *
  * Return: void.
  */
 void _env(char **arv __attribute__ ((unused)))

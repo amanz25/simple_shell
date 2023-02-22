@@ -46,4 +46,23 @@ void _env(char **arv __attribute__ ((unused)));
 void _setenv(char **arv);
 void _unsetenv(char **arv);
 
+void freearv(char **arv);
+
+/**
+ * struct list_path - Linked list containing PATH directories
+ * @dir: directory in path
+ * @p: pointer to next node
+ */
+typedef struct list_path
+{
+	char *dir;
+	struct list_path *p;
+} list_path;
+
+void free_list(list_path *head);
+char *_which(char *filename, list_path *head);
+list_path *linkpath(char *path);
+list_path *add_node_end(list_path **head, char *str);
+char *_getenv(const char *name);
+
 #endif

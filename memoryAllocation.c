@@ -72,3 +72,19 @@ void EndOfFile(char *b, int l)
 		exit(0);
 	}
 }
+
+/**
+ * freearv - frees the array of pointers arv
+ *@arv: array of pointers
+ *
+ * Return: void.
+ */
+
+void freearv(char **arv)
+{
+	int i;
+
+	for (i = 0; arv[i]; i++)
+		free(arv[i]);
+	free(arv);
+}
