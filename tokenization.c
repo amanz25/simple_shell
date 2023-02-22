@@ -15,7 +15,7 @@ char **tokenize(char *s, const char *d)
 	cpy = malloc(_strlen(s) + 1);
 	if (cpy == NULL)
 	{
-		perror("failure on malloc");
+		perror(_getenv("_"));
 		return (NULL);
 	}
 	for (count = 0; s[count]; count++)
