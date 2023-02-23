@@ -32,8 +32,7 @@ void sig_handler(int sig_num)
 {
 	if (sig_num == SIGINT)
 	{
-		_puts("\n");
-		exit(0);
+		_puts("\n#cisfun$ ");
 	}
 }
 
@@ -52,7 +51,7 @@ void terminal(void)
 /**
  * main - our simple shell
  *
- * Return: void.
+ * Return: 0.
  */
 int main(void)
 {

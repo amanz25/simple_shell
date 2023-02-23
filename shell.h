@@ -44,7 +44,7 @@ void(*checkcommand(char **arv))(char **arv);
 
 void _exit_cmd(char **arv);
 int _atoi(char *s);
-void _env(char **arv __attribute__ ((unused)));
+void _env(char **arv);
 void _setenv(char **arv);
 void _unsetenv(char **arv);
 void freearv(char **arv);
