@@ -94,7 +94,5 @@ int main(void)
 	free_list(head);
 	freearv(arv);
 	free(buff);
-	free(p);
-	free(v);
 	return (0);
 }

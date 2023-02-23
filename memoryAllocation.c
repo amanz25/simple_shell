@@ -62,7 +62,12 @@ void freearv(char **arv)
 {
 	int i;
 
+	if (arv == NULL)
+		return;
 	for (i = 0; arv[i]; i++)
+		free(arv[i]);
+
+	if (arv[i] == NULL)
 		free(arv[i]);
 	free(arv);
 }
