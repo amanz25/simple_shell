@@ -91,7 +91,6 @@ int main(void)
 			}
 		}
 	}
-	free(p);
 	free_list(head);
 	freearv(arv);
 	free(buff);
