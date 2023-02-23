@@ -59,7 +59,7 @@ int main(void)
 	size_t size = 0;
 	char *buff = NULL, **arv, *v, *p;
 	list_path *head = '\0';
-	void (*func)(char **);
+	void (*f)(char **);
 
 	signal(SIGINT, sig_handler);
 	while (l != EOF)
@@ -75,15 +75,15 @@ int main(void)
 			v = _getenv("PATH");
 			head = linkpath(v);
 			p = _which(arv[0], head);
-			func = checkcommand(arv);
-			if (func)
+			f = checkcommand(arv);
+			if (f)
 			{
 				free(buff);
-				func(arv);
+				f(arv);
 			}
 			else if (!p)
 				executeCmd(arv);
-			else
+			else if (p)
 			{
 				free(arv[0]);
 				arv[0] = p;
