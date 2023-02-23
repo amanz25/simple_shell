@@ -9,32 +9,30 @@
  */
 char **tokenize(char *s, const char *d)
 {
-	int argc = 0, count;
-	char *t;
-	char **argv;
+	int count, size;
+	char **ar, *t, *cpy;
 
-	char *cpy = _strdup(s);
-
-	strcpy(cpy, s);
-	t = strtok(s, d);
-	argc++;
-	while (t)
+	cpy = malloc(_strlen(s) + 1);
+	if (cpy == NULL)
 	{
-		argc++;
-		t = strtok(NULL, d);
+		perror(_getenv("_"));
+		return (NULL);
 	}
+	for (count = 0; s[count]; count++)
+		cpy[count] = s[count];
 
-	argv = malloc((sizeof(char *) * argc));
+	cpy[count] = '\0';
 	t = strtok(cpy, d);
-
-	for (count = 0; t; count++)
+	ar = malloc((sizeof(char *) * 2));
+	ar[0] = _strdup(t);
+	for (count = 1, size = 3; t; count++, size++)
 	{
-		argv[count] = malloc(sizeof(char) * _strlen(t));
-		strcpy(argv[count], t);
 		t = strtok(NULL, d);
+		ar = Mem_Realloc(ar, (sizeof(char *) * (size - 1)), (sizeof(char *) * size));
+		ar[count] = _strdup(t);
 	}
-	argv[count] = NULL;
-	return (argv);
+	free(cpy);
+	return (ar);
 }
 
 /**
