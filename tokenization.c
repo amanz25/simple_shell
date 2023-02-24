@@ -1,69 +1,94 @@
 #include "shell.h"
 
 /**
- * tokenize - tokenize/split string based on delimiter
- * @s: string to be tokenized
- * @d: delimiter/common separator
- *
- * Return: pointer to array of string
+ * **strtow2 - splits a string into words
+ * @str: the input string
+ * @d: the delimeter
+ * Return: a pointer to an array of strings, or NULL on failure
  */
-char **tokenize(char *s, const char *d)
+char **strtow2(char *str, char d)
 {
-	int count, size;
-	char **ar, *t, *cpy;
+	int i, j, k, m, numwords = 0;
+	char **s;
 
-	cpy = malloc(_strlen(s) + 1);
-	if (cpy == NULL)
-	{
-		perror(_getenv("_"));
+	if (str == NULL || str[0] == 0)
 		return (NULL);
-	}
-	for (count = 0; s[count]; count++)
-		cpy[count] = s[count];
-
-	cpy[count] = '\0';
-	t = strtok(cpy, d);
-	ar = malloc((sizeof(char *) * 2));
-	ar[0] = _strdup(t);
-	for (count = 1, size = 3; t; count++, size++)
+	for (i = 0; str[i] != '\0'; i++)
+		if ((str[i] != d && str[i + 1] == d) ||
+		    (str[i] != d && !str[i + 1]) || str[i + 1] == d)
+			numwords++;
+	if (numwords == 0)
+		return (NULL);
+	s = malloc((1 + numwords) * sizeof(char *));
+	if (!s)
+		return (NULL);
+	for (i = 0, j = 0; j < numwords; j++)
 	{
-		t = strtok(NULL, d);
-		ar = Mem_Realloc(ar, (sizeof(char *) * (size - 1)), (sizeof(char *) * size));
-		ar[count] = _strdup(t);
+		while (str[i] == d && str[i] != d)
+			i++;
+		k = 0;
+		while (str[i + k] != d && str[i + k] && str[i + k] != d)
+			k++;
+		s[j] = malloc((k + 1) * sizeof(char));
+		if (!s[j])
+		{
+			for (k = 0; k < j; k++)
+				free(s[k]);
+			free(s);
+			return (NULL);
+		}
+		for (m = 0; m < k; m++)
+			s[j][m] = str[i++];
+		s[j][m] = 0;
 	}
-	free(cpy);
-	return (ar);
+	s[j] = NULL;
+	return (s);
 }
 
 /**
-* checkcommand - checks if the command is a buildin
-* @arv: array of arguments
-* Return: pointer to function that takes arv and returns void
-*/
-void(*checkcommand(char **arv))(char **arv)
-{
-	int i, j;
-	command T[] = {
-		{"exit", _exit_cmd},
-		{"env", _env},
-		{"setenv", _setenv},
-		{"unsetenv", _unsetenv},
-		{NULL, NULL}
-	};
+ * **strtow - splits a string into words. Repeat delimiters are ignored
+ * @str: the input string
+ * @d: the delimeter string
+ * Return: a pointer to an array of strings, or NULL on failure
+ */
 
-	for (i = 0; T[i].name; i++)
+char **strtow(char *str, char *d)
+{
+	int i, j, k, m, numwords = 0;
+	char **s;
+
+	if (str == NULL || str[0] == 0)
+		return (NULL);
+	if (!d)
+		d = " ";
+	for (i = 0; str[i] != '\0'; i++)
+		if (!is_delim(str[i], d) && (is_delim(str[i + 1], d) || !str[i + 1]))
+			numwords++;
+
+	if (numwords == 0)
+		return (NULL);
+	s = malloc((1 + numwords) * sizeof(char *));
+	if (!s)
+		return (NULL);
+	for (i = 0, j = 0; j < numwords; j++)
 	{
-		j = 0;
-		if (T[i].name[j] == arv[0][j])
+		while (is_delim(str[i], d))
+			i++;
+		k = 0;
+		while (!is_delim(str[i + k], d) && str[i + k])
+			k++;
+		s[j] = malloc((k + 1) * sizeof(char));
+		if (!s[j])
 		{
-			for (j = 0; arv[0][j]; j++)
-			{
-				if (T[i].name[j] != arv[0][j])
-					break;
-			}
-			if (!arv[0][j])
-				return (T[i].func);
+			for (k = 0; k < j; k++)
+				free(s[k]);
+			free(s);
+			return (NULL);
 		}
+		for (m = 0; m < k; m++)
+			s[j][m] = str[i++];
+		s[j][m] = 0;
 	}
-	return (0);
+	s[j] = NULL;
+	return (s);
 }

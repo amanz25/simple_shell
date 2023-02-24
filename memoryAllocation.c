@@ -1,73 +1,79 @@
 #include "shell.h"
 
 /**
- * Mem_Realloc - reallocate memory
- * @ptrPrev: pointer to be reallocated
- * @old_size: current size of the pointer
- * @new_size: new size to be reallocated
+ * bfree - frees a pointer and NULLs the address
+ * @ptr: address of the pointer to free
  *
- * Return: void.
+ * Return: 1 if freed, otherwise 0.
  */
-void *Mem_Realloc(void *ptrPrev, unsigned int old_size, unsigned int new_size)
+int bfree(void **ptr)
 {
-	unsigned int count;
-	char *old, *new;
-
-	if (ptrPrev == NULL)
-		return (malloc(new_size));
-	if (new_size == old_size)
-		return (ptrPrev);
-	if (new_size == 0 && ptrPrev != NULL)
+	if (ptr && *ptr)
 	{
-		free(ptrPrev);
-		return (NULL);
+		free(*ptr);
+		*ptr = NULL;
+		return (1);
 	}
-	new = malloc(new_size);
-	old = ptrPrev;
-	if (new == NULL)
-		return (NULL);
-	if (new_size > old_size)
-	{
-		count = 0;
-		while (count < old_size)
-		{
-			new[count] = old[count];
-			count++;
-		}
-		free(ptrPrev);
-		count = old_size;
-		while (count < new_size)
-		{
-			new[count] = '\0';
-			count++;
-		}
-	}
-	if (new_size < old_size)
-	{
-		for (count = 0; count < new_size; count++)
-			new[count] = old[count];
-		free(ptrPrev);
-	}
-	return (new);
+	return (0);
 }
 
 /**
- * freearv - frees the array of pointers arv
- *@arv: array of pointers
+ * _realloc - reallocates a block of memory
+ * @ptr: pointer to previous malloc'ated block
+ * @old_size: byte size of previous block
+ * @new_size: byte size of new block
  *
- * Return: void.
+ * Return: pointer to the old block.
  */
-
-void freearv(char **arv)
+void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
 {
-	int i;
+	char *p;
 
-	if (arv == NULL)
+	if (!ptr)
+		return (malloc(new_size));
+	if (!new_size)
+		return (free(ptr), NULL);
+	if (new_size == old_size)
+		return (ptr);
+
+	p = malloc(new_size);
+	if (!p)
+		return (NULL);
+
+	old_size = old_size < new_size ? old_size : new_size;
+	while (old_size--)
+		p[old_size] = ((char *)ptr)[old_size];
+	free(ptr);
+	return (p);
+}
+
+/**
+ **_memset - fills memory with a constant byte
+ *@s: the pointer to the memory area
+ *@b: the byte to fill *s with
+ *@n: the amount of bytes to be filled
+ *Return: (s) a pointer to the memory area s
+ */
+char *_memset(char *s, char b, unsigned int n)
+{
+	unsigned int i;
+
+	for (i = 0; i < n; i++)
+		s[i] = b;
+	return (s);
+}
+
+/**
+ * ffree - frees a string of strings
+ * @pp: string of strings
+ */
+void ffree(char **pp)
+{
+	char **a = pp;
+
+	if (!pp)
 		return;
-	for (i = 0; arv[i]; i++)
-		free(arv[i]);
-
-	if (arv[i] == NULL)
-		free(arv[i]);
-	free(arv);
+	while (*pp)
+		free(*pp++);
+	free(a);
 }

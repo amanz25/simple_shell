@@ -1,111 +1,97 @@
 #include "shell.h"
 
 /**
- * _putchar - prints character
- * @c: character to be printed
+ * _strlen - returns the length of a string
+ * @s: the string whose length to check
  *
- * Return: 1 (success) , -1 (error)
+ * Return: integer length of string
  */
-int _putchar(char c)
+int _strlen(char *s)
 {
-	return (write(1, &c, 1));
-}
-
-/**
- * _puts - print string using the above print character func
- * @s: char pointer to the string to be printed
- *
- * Return: void.
- */
-
-void _puts(char *s)
-{
-	int count;
-
-	for (count = 0; s[count]; count++)
-		_putchar(s[count]);
-}
-
-/**
- * _strlen - count the characters in the string
- * @str: string to be checked
- *
- * Return: character count
- */
-int _strlen(char *str)
-{
-	int count;
-
-	for (count = 0; *(str + count) != '\0'; count++)
-		;
-
-	return (count);
-}
-
-/**
- * _strdup - copy string and allocate a new memory
- * @s: string to be copied pointer
- *
- * Return: string pointer
- */
-char *_strdup(char *s)
-{
-	int count, newCount;
-	char *cpy;
+	int i = 0;
 
 	if (!s)
-		return (NULL);
+		return (0);
 
-	count = 0;
-	while (s[count] != '\0')
-		count++;
-
-	cpy = malloc(sizeof(char) * count + 1);
-	if (!cpy)
-		return (NULL);
-	newCount = 0;
-	while (newCount < count)
-	{
-		cpy[newCount] = s[newCount];
-		newCount++;
-	}
-	cpy[count] = s[count];
-	return (cpy);
+	while (*s++)
+		i++;
+	return (i);
 }
 
 /**
- * concat - concats 3 strings in a newly allocated memory
- * @name: first string
- * @sep: second string
- * @value: Third string
- * Return: pointer to the new string
+ * _strcmp - performs lexicogarphic comparison of two strangs.
+ * @s1: the first strang
+ * @s2: the second strang
+ *
+ * Return: negative if s1 < s2, positive if s1 > s2, zero if s1 == s2
  */
-char *concat(char *name, char *sep, char *value)
+int _strcmp(char *s1, char *s2)
 {
-	char *result;
-	int l1, l2, l3, i, k;
+	while (*s1 && *s2)
+	{
+		if (*s1 != *s2)
+			return (*s1 - *s2);
+		s1++;
+		s2++;
+	}
+	if (*s1 == *s2)
+		return (0);
+	else
+		return (*s1 < *s2 ? -1 : 1);
+}
 
-	l1 = _strlen(name);
-	l2 = _strlen(sep);
-	l3 = _strlen(value);
+/**
+ * _strcpy - copies a string
+ * @dest: the destination
+ * @src: the source
+ *
+ * Return: pointer to destination
+ */
+char *_strcpy(char *dest, char *src)
+{
+	int i = 0;
 
-	result = malloc(l1 + l2 + l3 + 1);
-	if (!result)
-		return (NULL);
+	if (dest == src || src == 0)
+		return (dest);
+	while (src[i])
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = 0;
+	return (dest);
+}
 
-	for (i = 0; name[i]; i++)
-		result[i] = name[i];
-	k = i;
+/**
+ * starts_with - checks if needle starts with haystack
+ * @haystack: string to search
+ * @needle: the substring to find
+ *
+ * Return: address of next char of haystack or NULL
+ */
+char *starts_with(const char *haystack, const char *needle)
+{
+	while (*needle)
+		if (*needle++ != *haystack++)
+			return (NULL);
+	return ((char *)haystack);
+}
 
-	for (i = 0; sep[i]; i++)
-		result[k + i] = sep[i];
-	k = k + i;
+/**
+ * _strcat - concatenates two strings
+ * @dest: the destination buffer
+ * @src: the source buffer
+ *
+ * Return: pointer to destination buffer
+ */
+char *_strcat(char *dest, char *src)
+{
+	char *ret = dest;
 
-	for (i = 0; value[i]; i++)
-		result[k + i] = value[i];
-	k = k + i;
-
-	result[k] = '\0';
-
-	return (result);
+	while (*dest)
+		dest++;
+	while (*src)
+		*dest++ = *src++;
+	*dest = *src;
+	return (ret);
 }

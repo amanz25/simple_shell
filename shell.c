@@ -1,98 +1,95 @@
 #include "shell.h"
 
+/**
+ * sigintHandler - blocks ctrl-C
+ * @sig_num: the signal number
+ *
+ * Return: void
+ */
+void sigintHandler(__attribute__((unused))int sig_num)
+{
+	_puts("\n");
+	_puts("$ ");
+	_putchar(BUF_FLUSH);
+}
 
 /**
- * EndOfFile - handles buffer end of file
- * @b: buffer
- * @l: length of input by std in
+ * read_buf - reads a buffer
+ * @info: parameter struct
+ * @buf: buffer
+ * @i: size
  *
- * Return: void.
+ * Return: r
  */
-void EndOfFile(char *b, int l)
+ssize_t read_buf(info_t *info, char *buf, size_t *i)
 {
-	(void) b;
-	if (l == -1)
-	{
-		if (isatty(STDIN_FILENO))
+	ssize_t r = 0;
+
+	if (*i)
+		return (0);
+	r = read(info->readfd, buf, READ_BUF_SIZE);
+	if (r >= 0)
+		*i = r;
+	return (r);
+}
+
+/**
+ * remove_comments - function replaces first instance of '#' with '\0'
+ * @buf: address of the string to modify
+ *
+ * Return: Always 0;
+ */
+void remove_comments(char *buf)
+{
+	int i;
+
+	for (i = 0; buf[i] != '\0'; i++)
+		if (buf[i] == '#' && (!i || buf[i - 1] == ' '))
 		{
-			_puts("\n");
-			free(b);
+			buf[i] = '\0';
+			break;
 		}
-		exit(0);
-	}
 }
 
 /**
- * sig_handler - checks if Ctrl C is pressed
- * @sig_num: int
+ * main - entry point
+ * @ac: arg count
+ * @av: arg vector
  *
- * Return: void.
+ * Return: 0 on success, 1 on error
  */
-void sig_handler(int sig_num)
+int main(int ac, char **av)
 {
-	if (sig_num == SIGINT)
+	info_t info[] = { INFO_INIT };
+	int fd = 2;
+
+	asm ("mov %1, %0\n\t"
+		"add $3, %0"
+		: "=r" (fd)
+		: "r" (fd));
+
+	if (ac == 2)
 	{
-		_puts("\n#cisfun$ ");
-	}
-}
-
-/**
-  * terminal - verif if terminal
-  *
-  * Return: void.
-  */
-
-void terminal(void)
-{
-	if (isatty(STDIN_FILENO))
-		_puts("#cisfun$ ");
-}
-
-/**
- * main - our simple shell
- *
- * Return: 0.
- */
-int main(void)
-{
-	ssize_t l = 0;
-	size_t size = 0;
-	char *buff = NULL, **arv, *v, *p;
-	list_path *head = '\0';
-	void (*f)(char **);
-
-	signal(SIGINT, sig_handler);
-	while (l != EOF)
-	{
-		terminal();
-		l = getline(&buff, &size, stdin);
-		EndOfFile(buff, l);
-		arv = tokenize(buff, " \n");
-		if (!arv || !arv[0])
-			executeCmd(arv);
-		else
+		fd = open(av[1], O_RDONLY);
+		if (fd == -1)
 		{
-			v = _getenv("PATH");
-			head = linkpath(v);
-			p = _which(arv[0], head);
-			f = checkcommand(arv);
-			if (f)
+			if (errno == EACCES)
+				exit(126);
+			if (errno == ENOENT)
 			{
-				free(buff);
-				f(arv);
+				_eputs(av[0]);
+				_eputs(": 0: Can't open ");
+				_eputs(av[1]);
+				_eputchar('\n');
+				_eputchar(BUF_FLUSH);
+				exit(127);
 			}
-			else if (!p)
-				executeCmd(arv);
-			else if (p)
-			{
-				free(arv[0]);
-				arv[0] = p;
-				executeCmd(arv);
-			}
+			return (EXIT_FAILURE);
 		}
+		info->readfd = fd;
 	}
-	free_list(head);
-	freearv(arv);
-	free(buff);
-	return (0);
+	populate_env_list(info);
+	read_history(info);
+	hsh(info, av);
+	return (EXIT_SUCCESS);
 }

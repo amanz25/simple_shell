@@ -1,163 +1,161 @@
 #include "shell.h"
 
 /**
- * _atoi - converts a string into an integer
- *@s: pointer to a string
- *Return: converted integer
+ * find_builtin - finds a builtin command
+ * @info: the parameter & return info struct
+ *
+ * Return: -1 if builtin not found,
+ *			0 if builtin executed successfully,
+ *			1 if builtin found but not successful,
+ *			-2 if builtin signals exit()
  */
-int _atoi(char *s)
+int find_builtin(info_t *info)
 {
-	int i, integer, sign = 1;
+	int i, built_in_ret = -1;
+	builtin_table builtintbl[] = {
+		{"exit", _myexit},
+		{"env", _myenv},
+		{"help", _myhelp},
+		{"history", _myhistory},
+		{"setenv", _mysetenv},
+		{"unsetenv", _myunsetenv},
+		{"cd", _mycd},
+		{"alias", _myalias},
+		{NULL, NULL}
+	};
 
-	i = 0;
-	integer = 0;
-	while (!((s[i] >= '0') && (s[i] <= '9')) && (s[i] != '\0'))
-	{
-		if (s[i] == '-')
+	for (i = 0; builtintbl[i].type; i++)
+		if (_strcmp(info->argv[0], builtintbl[i].type) == 0)
 		{
-			sign = sign * (-1);
+			info->line_count++;
+			built_in_ret = builtintbl[i].func(info);
+			break;
 		}
-		i++;
-	}
-	while ((s[i] >= '0') && (s[i] <= '9'))
-	{
-		integer = (integer * 10) + (sign * (s[i] - '0'));
-		i++;
-	}
-	return (integer);
+	return (built_in_ret);
 }
 
 /**
- * _exit_cmd - exits the shell with or without a return of status n
- * @arv: array of words of the entered line
+ * hsh - main shell loop
+ * @info: the parameter & return info struct
+ * @av: the argument vector from main()
  *
- * Return: void.
+ * Return: 0 on success, 1 on error, or error code
  */
-void _exit_cmd(char **arv)
+int hsh(info_t *info, char **av)
 {
-	int i, n;
+	ssize_t r = 0;
+	int builtin_ret = 0;
 
-	if (arv[1])
+	while (r != -1 && builtin_ret != -2)
 	{
-		n = _atoi(arv[1]);
-		if (n <= -1)
-			n = 2;
-		freearv(arv);
-		exit(n);
+		clear_info(info);
+		if (interactive(info))
+			_puts("$ ");
+		_eputchar(BUF_FLUSH);
+		r = get_input(info);
+		if (r != -1)
+		{
+			set_info(info, av);
+			builtin_ret = find_builtin(info);
+			if (builtin_ret == -1)
+				find_cmd(info);
+		}
+		else if (interactive(info))
+			_putchar('\n');
+		free_info(info, 0);
 	}
-	for (i = 0; arv[i]; i++)
-		free(arv[i]);
-	free(arv);
-	exit(0);
+	write_history(info);
+	free_info(info, 1);
+	if (!interactive(info) && info->status)
+		exit(info->status);
+	if (builtin_ret == -2)
+	{
+		if (info->err_num == -1)
+			exit(info->status);
+		exit(info->err_num);
+	}
+	return (builtin_ret);
+}
+
+
+/**
+ * find_cmd - finds a command in PATH
+ * @info: the parameter & return info struct
+ *
+ * Return: void
+ */
+void find_cmd(info_t *info)
+{
+	char *path = NULL;
+	int i, k;
+
+	info->path = info->argv[0];
+	if (info->linecount_flag == 1)
+	{
+		info->line_count++;
+		info->linecount_flag = 0;
+	}
+	for (i = 0, k = 0; info->arg[i]; i++)
+		if (!is_delim(info->arg[i], " \t\n"))
+			k++;
+	if (!k)
+		return;
+
+	path = find_path(info, _getenv(info, "PATH="), info->argv[0]);
+	if (path)
+	{
+		info->path = path;
+		fork_cmd(info);
+	}
+	else
+	{
+		if ((interactive(info) || _getenv(info, "PATH=")
+			|| info->argv[0][0] == '/') && is_cmd(info, info->argv[0]))
+			fork_cmd(info);
+		else if (*(info->arg) != '\n')
+		{
+			info->status = 127;
+			print_error(info, "not found\n");
+		}
+	}
 }
 
 /**
- * _env - prints the current environment
- * @arv: array of arguments
+ * fork_cmd - forks a an exec thread to run cmd
+ * @info: the parameter & return info struct
  *
- * Return: void.
+ * Return: void
  */
-void _env(char **arv __attribute__ ((unused)))
+void fork_cmd(info_t *info)
 {
+	pid_t child_pid;
 
-	int i;
-
-	for (i = 0; environ[i]; i++)
+	child_pid = fork();
+	if (child_pid == -1)
 	{
-		_puts(environ[i]);
-		_puts("\n");
-	}
-
-}
-
-/**
- * _setenv - Initialize a new environment variable, or modify an existing one
- * @arv: array of entered words
- *
- * Return: void.
- */
-void _setenv(char **arv)
-{
-	int i, j, k;
-
-	if (!arv[1] || !arv[2])
-	{
-		perror(_getenv("_"));
+		/* TODO: PUT ERROR FUNCTION */
+		perror("Error:");
 		return;
 	}
-
-	for (i = 0; environ[i]; i++)
+	if (child_pid == 0)
 	{
-		j = 0;
-		if (arv[1][j] == environ[i][j])
+		if (execve(info->path, info->argv, get_environ(info)) == -1)
 		{
-			while (arv[1][j])
-			{
-				if (arv[1][j] != environ[i][j])
-					break;
-
-				j++;
-			}
-			if (arv[1][j] == '\0')
-			{
-				k = 0;
-				while (arv[2][k])
-				{
-					environ[i][j + 1 + k] = arv[2][k];
-					k++;
-				}
-				environ[i][j + 1 + k] = '\0';
-				return;
-			}
+			free_info(info, 1);
+			if (errno == EACCES)
+				exit(126);
+			exit(1);
 		}
+		/* TODO: PUT ERROR FUNCTION */
 	}
-	if (!environ[i])
+	else
 	{
-
-		environ[i] = concat(arv[1], "=", arv[2]);
-		environ[i + 1] = '\0';
-
-	}
-}
-
-/**
- * _unsetenv - Remove an environment variable
- * @arv: array of entered words
- *
- * Return: void.
- */
-void _unsetenv(char **arv)
-{
-	int i, j;
-
-	if (!arv[1])
-	{
-		perror(_getenv("_"));
-		return;
-	}
-	for (i = 0; environ[i]; i++)
-	{
-		j = 0;
-		if (arv[1][j] == environ[i][j])
+		wait(&(info->status));
+		if (WIFEXITED(info->status))
 		{
-			while (arv[1][j])
-			{
-				if (arv[1][j] != environ[i][j])
-					break;
-
-				j++;
-			}
-			if (arv[1][j] == '\0')
-			{
-				free(environ[i]);
-				environ[i] = environ[i + 1];
-				while (environ[i])
-				{
-					environ[i] = environ[i + 1];
-					i++;
-				}
-				return;
-			}
+			info->status = WEXITSTATUS(info->status);
+			if (info->status == 126)
+				print_error(info, "Permission denied\n");
 		}
 	}
 }
