@@ -8,14 +8,14 @@
  */
 void free_list(list_path *head)
 {
-	list_path *storage;
+	list_path *tmp;
 
-	while (head)
+	while (head != NULL)
 	{
-		storage = head->p;
-		free(head->dir);
-		free(head);
-		head = storage;
+		tmp = head;
+		head = head->p;
+		free(tmp->dir);
+		free(tmp);
 	}
 
 }
